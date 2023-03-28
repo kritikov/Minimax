@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Minimax.Classes;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -217,6 +219,15 @@ namespace Minimax.Views
             Moves.Add($"On the table there are {CubesOnTable} cubes");
 
             // run minimax algorith
+            State state = new State();
+            state.CubesOnTable = CubesOnTable;
+            State.Minimax(state, k);
+
+            if (state.BestNextState == null)
+            {
+
+            }
+
 
             Moves.Add($"Max is playing and gets {1} cubes from the table");
             CubesOnTable--;

@@ -68,6 +68,7 @@ namespace Minimax.Views
             set
             {
                 k = value;
+                State.Choices[2] = k;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(K)));
             }
         }
@@ -218,20 +219,17 @@ namespace Minimax.Views
         {
             Moves.Add($"On the table there are {CubesOnTable} cubes");
 
-            // run minimax algorith
-            State state = new State();
-            state.CubesOnTable = CubesOnTable;
-            State.Minimax(state, k);
-
-            if (state.BestNextState == null)
+            if (cubesOnTable > 0)
             {
+                State state = new State();
+                state.CubesOnTable = CubesOnTable;
+                state.Player = Classes.Player.Max;
+                State nextBextState = State.Minimax(state);
 
+                Moves.Add($"Max is playing and gets {nextBextState.CubesRemoved} cubes from the table");
+                CubesOnTable -= nextBextState.CubesRemoved;
+                Moves.Add($"On the table there are {CubesOnTable} cubes");
             }
-
-
-            Moves.Add($"Max is playing and gets {1} cubes from the table");
-            CubesOnTable--;
-            Moves.Add($"On the table there are {CubesOnTable} cubes");
 
             // check if max wins
             if (cubesOnTable <= 0)

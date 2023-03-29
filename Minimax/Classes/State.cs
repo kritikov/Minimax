@@ -17,10 +17,17 @@ namespace Minimax.Classes
     {
         public int CubesOnTable = 0;
         public Player Player;
-        public int evaluation = 0;
+        public int Evaluation = 0;
         public int CubesRemoved = 0;
-        public State? BestNextState;
+        public List<State> Childrens = new List<State>();
 
+        public static List<int> Choices = new List<int>() { 1, 2, 4 };
+
+        /// <summary>
+        /// Get a children with a specific number of cubes to remove
+        /// </summary>
+        /// <param name="cubesToRemove"></param>
+        /// <returns></returns>
         public State GetChild(int cubesToRemove)
         {
             try
@@ -28,6 +35,7 @@ namespace Minimax.Classes
                 State childState = new State();
                 childState.CubesOnTable = CubesOnTable - cubesToRemove;
                 childState.CubesRemoved = cubesToRemove;
+                childState.Player = (Player == Player.Max) ? Player.Min : Player.Max;
 
                 return childState;
             }
@@ -37,25 +45,45 @@ namespace Minimax.Classes
             }
         }
 
-        public void Evaluate(Player player, int k)
+        /// <summary>
+        /// Get the childrens of a state
+        /// </summary>
+        /// <returns></returns>
+        public List<State> GetChildrens()
         {
-            if (CubesOnTable == 1)
+            List<State> childrens = new List<State>();
+
+            foreach(var choice in State.Choices)
             {
-                evaluation = 1;
-                BestNextState = null;
-                CubesRemoved = 1;
+                if (this.CubesOnTable >= choice)
+                    childrens.Add(GetChild(choice));
             }
-            else if (CubesOnTable == 2)
+
+            return childrens;
+        }
+
+        /// <summary>
+        /// Evaluate a state
+        /// </summary>
+        public void Evaluate()
+        {
+            if (CubesOnTable == 0)
             {
-                evaluation = 1;
-                BestNextState = null;
-                CubesRemoved = 2;
+                Evaluation = (Player == Player.Max) ? -1 : 1;
             }
-            if (CubesOnTable == k)
+            else
             {
-                evaluation = 1;
-                BestNextState = null;
-                CubesRemoved = k;
+                var childrens = GetChildrens();
+
+                this.Childrens = childrens;
+
+                foreach(var child in childrens)
+                    child.Evaluate();
+
+                if (Player == Player.Max)
+                    Evaluation = childrens.Max(p => p.Evaluation);
+                else
+                    Evaluation = childrens.Min(p => p.Evaluation);
             }
         }
 
@@ -65,47 +93,30 @@ namespace Minimax.Classes
         /// <param name="initialState"></param>
         /// <param name="k"></param>
         /// <returns></returns>
-        public static void Minimax(State initialState, int k)
+        public static State? Minimax(State initialState)
         {
+            State? nextBestState = null;
+
             try
             {
-                // check if the algorithm in ended
-                if (initialState.CubesOnTable == 1)
-                {
-                    initialState.evaluation = 1;
-                    initialState.BestNextState = null;
-                    initialState.CubesRemoved = 1;
-                }
-                else if (initialState.CubesOnTable == 2)
-                {
-                    initialState.evaluation = 1;
-                    initialState.BestNextState = null;
-                    initialState.CubesRemoved = 2;
-                }
-                if (initialState.CubesOnTable == k)
-                {
-                    initialState.evaluation = 1;
-                    initialState.BestNextState = null;
-                    initialState.CubesRemoved = k;
-                }
+                // if there are no cubes on the table then there is no next move
+                if (initialState.CubesOnTable <= 0)
+                    return null;
+
+                // get the childrens of the initial state
+                List<State> childrens = initialState.GetChildrens();
+
+                // evaluate childrens
+                foreach (var child in childrens)
+                    child.Evaluate();
+
+                // choose as next move the one with the better evaluation
+                if (initialState.Player == Player.Max)
+                    nextBestState = childrens.OrderByDescending(p => p.Evaluation).FirstOrDefault();
                 else
-                {
-                    // get the childrens of the initial state
-                    List<State> childrens = new List<State>();
-                    childrens.Add(initialState.GetChild(1));
-                    childrens.Add(initialState.GetChild(2));
-                    if (initialState.CubesOnTable > k)
-                        childrens.Add(initialState.GetChild(k));
+                    nextBestState = childrens.OrderBy(p => p.Evaluation).FirstOrDefault();
 
-                    // evaluate the childrens
-                    foreach(var children in childrens)
-                    {
-                        Minimax(children, k);
-                    }
-
-                    // choose the best children as the next move
-                    initialState.BestNextState = childrens.OrderByDescending(p => p.evaluation).FirstOrDefault();
-                }
+                return nextBestState;
             }
             catch (Exception ex)
             {

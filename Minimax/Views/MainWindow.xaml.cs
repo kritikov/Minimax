@@ -54,6 +54,7 @@ namespace Minimax.Views
             set
             {
                 m = value;
+                State.FinalStateScore = M * 2;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(M)));
             }
         }
@@ -226,7 +227,7 @@ namespace Minimax.Views
                 state.Player = Classes.Player.Max;
                 State nextBextState = State.Minimax(state);
 
-                Moves.Add($"Max is playing and gets {nextBextState.CubesRemoved} cubes from the table");
+                Moves.Add($"AI is playing and gets {nextBextState.CubesRemoved} cubes from the table");
                 CubesOnTable -= nextBextState.CubesRemoved;
                 Moves.Add($"On the table there are {CubesOnTable} cubes");
             }
@@ -234,7 +235,7 @@ namespace Minimax.Views
             // check if max wins
             if (cubesOnTable <= 0)
             {
-                Moves.Add($"Max won the game!");
+                Moves.Add($"AI won the game!");
                 StopGame();
             }
             else
@@ -244,22 +245,28 @@ namespace Minimax.Views
             }
         }
         
-        private void MinPlay(int cubes)
+        private void MinPlay(int cubesToRemove)
         {
 
-            Moves.Add($"Min gets {cubes} cubes from the table");
-
-            CubesOnTable -= cubes;
-
-            // check if min wins
-            if (cubesOnTable <= 0)
+            if (CubesOnTable >= cubesToRemove)
             {
-                Moves.Add($"Min won the game!");
-                StopGame();
+                CubesOnTable -= cubesToRemove;
+                Moves.Add($"Player gets {cubesToRemove} cubes from the table");
+
+                // check if min wins
+                if (cubesOnTable <= 0)
+                {
+                    Moves.Add($"Player won the game!");
+                    StopGame();
+                }
+                else
+                {
+                    MaxPlay();
+                }
             }
             else
             {
-                MaxPlay();
+                Moves.Add($"You cant get {cubesToRemove} cubes from the table, choose again...");
             }
         }
 

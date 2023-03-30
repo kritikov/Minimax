@@ -19,9 +19,11 @@ namespace Minimax.Classes
         public Player Player;
         public int Evaluation = 0;
         public int CubesRemoved = 0;
+        public int Depth = 0;
         public List<State> Childrens = new List<State>();
 
         public static List<int> Choices = new List<int>() { 1, 2, 4 };
+        public static int FinalStateScore = 20;
 
         /// <summary>
         /// Get a children with a specific number of cubes to remove
@@ -35,6 +37,7 @@ namespace Minimax.Classes
                 State childState = new State();
                 childState.CubesOnTable = CubesOnTable - cubesToRemove;
                 childState.CubesRemoved = cubesToRemove;
+                childState.Depth = Depth + 1;
                 childState.Player = (Player == Player.Max) ? Player.Min : Player.Max;
 
                 return childState;
@@ -63,13 +66,19 @@ namespace Minimax.Classes
         }
 
         /// <summary>
-        /// Evaluate a state
+        /// Evaluate a state. A state is final when there are no cubes on the table.
+        /// The score of a final state is twice the initial number of the cubes on the table.
+        /// From this score, we remove the number of moves to reach this state in the tree.
+        /// This way, the best move from the availables is the winning one with the sorter path.
+        /// If the state is not final then its score is the best from its childrens.
         /// </summary>
         public void Evaluate()
         {
             if (CubesOnTable == 0)
             {
-                Evaluation = (Player == Player.Max) ? -1 : 1;
+                Evaluation = State.FinalStateScore - Depth;
+
+                Evaluation = (Player == Player.Max) ? -1 * Evaluation : 1 * Evaluation;
             }
             else
             {

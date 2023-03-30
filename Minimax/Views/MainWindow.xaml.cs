@@ -221,6 +221,9 @@ namespace Minimax.Views
             GameIsRunning = false;
         }
 
+        /// <summary>
+        /// Max decides and makes a move
+        /// </summary>
         private void MaxPlay()
         {
             Moves.Add($"On the table there are {CubesOnTable} cubes");
@@ -250,6 +253,10 @@ namespace Minimax.Views
             }
         }
         
+        /// <summary>
+        /// Min chooses and makes a move
+        /// </summary>
+        /// <param name="cubesToRemove"></param>
         private void MinPlay(int cubesToRemove)
         {
 

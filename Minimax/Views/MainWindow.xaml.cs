@@ -201,6 +201,9 @@ namespace Minimax.Views
 
         #region METHODS
 
+        /// <summary>
+        /// Create a new game
+        /// </summary>
         private void StartGame()
         {
             GameIsRunning = true;
@@ -209,10 +212,12 @@ namespace Minimax.Views
             MaxPlay();
         }
 
+        /// <summary>
+        /// Stop the current game
+        /// </summary>
         private void StopGame()
         {
             Message = "Set M and K and press 'start game' to play";
-
             GameIsRunning = false;
         }
 

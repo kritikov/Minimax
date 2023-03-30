@@ -134,6 +134,4 @@ namespace Minimax.Classes
         }
     }
 
-    
-
 }

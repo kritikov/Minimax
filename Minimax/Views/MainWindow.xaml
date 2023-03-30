@@ -6,7 +6,7 @@
         xmlns:Converters="clr-namespace:Minimax.Classes"
         xmlns:local="clr-namespace:Minimax"
         mc:Ignorable="d"
-        Title="MiniMax" Height="450" Width="655" WindowStartupLocation="CenterScreen">
+        Title="MiniMax game" Height="450" Width="655" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Converters:BooleanReverse x:Key="BooleanReverse"/>

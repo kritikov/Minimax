@@ -51,23 +51,42 @@
 
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
 
-            <Grid Grid.Column="2" Margin="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
+            <TabControl Grid.Column="2">
+                <TabItem Header="Game">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
 
-                <ListView Grid.Row="0" ItemsSource="{Binding MovesView}">
+                        <ListView Grid.Row="0" ItemsSource="{Binding MovesView}"/>
 
-                </ListView>
-
-                <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center" 
+                        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center" 
                             Visibility="{Binding GameIsRunning, Converter={StaticResource BooleanToVisibility}}">
-                    <Button Content="get 1 cube" Click="Get1Cube"/>
-                    <Button Content="get 2 cubes" Click="Get2Cubes"/>
-                    <Button Content="get K cubes" Click="GetKCubes"/>
-                </StackPanel>
-            </Grid>
+                            <Button Content="get 1 cube" Click="Get1Cube"/>
+                            <Button Content="get 2 cubes" Click="Get2Cubes"/>
+                            <Button Content="get K cubes" Click="GetKCubes"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Anaysis">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ListView Grid.Row="0"/>
+
+                        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="create tree" Width="100" Click="CreateTree" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"
+                                    ToolTip="Create the tree with the states from the given parameters. At the root will be the initial state of the game"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            
+            
             
         </Grid>
     </DockPanel>

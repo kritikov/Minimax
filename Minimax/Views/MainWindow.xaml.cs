@@ -165,7 +165,7 @@ namespace Minimax.Views
 
             movesSource.Source = Moves;
 
-            Message = "Set M and K and press 'start game' to play";
+            Message = "Set M and K and a game type to play";
         }
 
         #endregion
@@ -223,34 +223,89 @@ namespace Minimax.Views
 
         private void Get1Cube(object sender, RoutedEventArgs e)
         {
-            PlayerPlay(1);
+            Message = "";
+
+            try
+            {
+                PlayerPlay(1);
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
         }
 
         private void Get2Cubes(object sender, RoutedEventArgs e)
         {
-            PlayerPlay(2);
+            Message = "";
+
+            try
+            {
+                PlayerPlay(2);
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
         }
 
         private void GetKCubes(object sender, RoutedEventArgs e)
         {
-            PlayerPlay(K);
+            Message = "";
+
+            try
+            {
+                PlayerPlay(K);
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
         }
 
+        private void CreateTree(object sender, RoutedEventArgs e)
+        {
+            Message = "";
+
+            try
+            {
+                State state = new State();
+                state.CubesOnTable = M;
+                state.Player = Player.Max;
+
+                CreateTree(state);
+
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
+
+            
+        }
         #endregion
 
 
         #region METHODS
 
         /// <summary>
+        /// Initialize the game using the given parameters
+        /// </summary>
+        private void InitializeGame()
+        {
+            GameIsRunning = true;
+            CubesOnTable = M;
+            Moves.Clear();
+            Moves.Add($"On the table there are {CubesOnTable} cubes");
+        }
+
+        /// <summary>
         /// Create a new game AI vs Player
         /// </summary>
         private void AIvsPlayer()
         {
-            GameIsRunning = true;
-            CubesOnTable = M;
+            InitializeGame();
             TypeOfGame = GameType.AIvsPlayer;
-            Moves.Clear();
-            Moves.Add($"On the table there are {CubesOnTable} cubes");
             MaxPlay();
         }
 
@@ -259,11 +314,8 @@ namespace Minimax.Views
         /// </summary>
         private void AIvsAI()
         {
-            GameIsRunning = true;
-            CubesOnTable = M;
+            InitializeGame();
             TypeOfGame = GameType.AIvsAI;
-            Moves.Clear();
-            Moves.Add($"On the table there are {CubesOnTable} cubes");
             MaxPlay();
         }
 
@@ -272,8 +324,7 @@ namespace Minimax.Views
         /// </summary>
         private void StopGame()
         {
-            Message = "Set M and K and press 'start game' to play";
-            //Moves.Clear();
+            Message = "Set M and K and a game type to play";
             GameIsRunning = false;
         }
 
@@ -371,8 +422,30 @@ namespace Minimax.Views
             }
         }
 
+        private void CreateTree(State state)
+        {
+            try
+            {
+                if (state.CubesOnTable > 0)
+                {
+                    // get the childrens of the initial state
+                    state.CreateChildrens();
+
+                    // evaluate childrens
+                    foreach (var child in state.Childrens)
+                        child.Evaluate();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         #endregion
 
-        
+
+
+
     }
 }

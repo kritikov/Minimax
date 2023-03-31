@@ -152,6 +152,16 @@ namespace Minimax.Views
             }
         }
 
+        public ObservableCollection<State> Analysis { get; set; } = new ObservableCollection<State>();
+        private CollectionViewSource analysisSource = new CollectionViewSource();
+        public ICollectionView AnalysisView
+        {
+            get
+            {
+                return this.analysisSource.View;
+            }
+        }
+
         #endregion
 
 
@@ -283,6 +293,7 @@ namespace Minimax.Views
 
             
         }
+        
         #endregion
 
 
@@ -435,6 +446,11 @@ namespace Minimax.Views
                     foreach (var child in state.Childrens)
                         child.Evaluate();
                 }
+
+                Analysis.Clear();
+                Analysis.Add(state);
+                analysisSource.Source = Analysis;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisView)));
             }
             catch (Exception ex)
             {

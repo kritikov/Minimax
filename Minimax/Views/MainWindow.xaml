@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Converters="clr-namespace:Minimax.Classes"
+        xmlns:Classes="clr-namespace:Minimax.Classes"
         xmlns:local="clr-namespace:Minimax"
         mc:Ignorable="d"
         Title="MiniMax game" Height="450" Width="655" WindowStartupLocation="CenterScreen">
@@ -76,7 +77,38 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
 
-                        <ListView Grid.Row="0"/>
+                        <TreeView Grid.Row="0" ItemsSource="{Binding AnalysisView}">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="IsExpanded" Value="False"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type Classes:State}" ItemsSource="{Binding Childrens}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>
+                                            <Run Text="Cubes remaining: "/>
+                                            <Run Text="{Binding CubesOnTable}"/>
+                                            <Run Text=", "/>
+                                        </TextBlock>
+                                        <TextBlock>
+                                            <Run Text="Cubes removed: "/>
+                                            <Run Text="{Binding CubesRemoved}"/>
+                                            <Run Text=", "/>
+                                        </TextBlock>
+                                        <TextBlock>
+                                            <Run Text="Score: "/>
+                                            <Run Text="{Binding Score}"/>
+                                            <Run Text=", "/>
+                                        </TextBlock>
+                                        <TextBlock>
+                                            <Run Text="Next move by: "/>
+                                            <Run Text="{Binding Player}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </HierarchicalDataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
 
                         <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Content="create tree" Width="100" Click="CreateTree" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"

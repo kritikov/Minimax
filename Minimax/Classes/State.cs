@@ -18,13 +18,13 @@ namespace Minimax.Classes
         public static List<int> Choices = new List<int>() { 1, 2, 4 };
         public static int FinalStateScore = 20;
 
-        public int CubesOnTable = 0;
-        public Player Player;
-        public int Evaluation = 0;
-        public int CubesRemoved = 0;
-        public int Depth = 0;
-        public List<State> Childrens = new List<State>();
-        public State? Parent;
+        public int CubesOnTable { get; set; } = 0;
+        public Player Player { get; set; }
+        public int Score { get; set; } = 0;
+        public int CubesRemoved { get; set; } = 0;
+        public int Depth { get; set; } = 0;
+        public List<State> Childrens { get; set; } = new List<State>();
+        public State? Parent { get; set; }
 
 
         /// <summary>
@@ -73,9 +73,9 @@ namespace Minimax.Classes
         {
             if (CubesOnTable == 0)
             {
-                Evaluation = State.FinalStateScore - Depth;
+                Score = State.FinalStateScore - Depth;
 
-                Evaluation = (Player == Player.Max) ? -1 * Evaluation : 1 * Evaluation;
+                Score = (Player == Player.Max) ? -1 * Score : 1 * Score;
             }
             else
             {
@@ -85,9 +85,9 @@ namespace Minimax.Classes
                     child.Evaluate();
 
                 if (Player == Player.Max)
-                    Evaluation = this.Childrens.Max(p => p.Evaluation);
+                    Score = this.Childrens.Max(p => p.Score);
                 else
-                    Evaluation = this.Childrens.Min(p => p.Evaluation);
+                    Score = this.Childrens.Min(p => p.Score);
             }
         }
 
@@ -116,9 +116,9 @@ namespace Minimax.Classes
 
                 // choose as next move the one with the better evaluation
                 if (state.Player == Player.Max)
-                    nextBestState = state.Childrens.OrderByDescending(p => p.Evaluation).FirstOrDefault();
+                    nextBestState = state.Childrens.OrderByDescending(p => p.Score).FirstOrDefault();
                 else
-                    nextBestState = state.Childrens.OrderBy(p => p.Evaluation).FirstOrDefault();
+                    nextBestState = state.Childrens.OrderBy(p => p.Score).FirstOrDefault();
 
                 return nextBestState;
             }

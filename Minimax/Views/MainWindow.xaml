@@ -43,7 +43,8 @@
                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding K, Mode=TwoWay}" Width="50" HorizontalAlignment="Left"/>
 
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="10">
-                    <Button Content="start game" Width="100" Click="Start" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"/>
+                    <Button Content="AI vs Player" Width="100" Click="AIvsPlayer" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"/>
+                    <Button Content="AI vs AI" Width="100" Click="AIvsAI" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"/>
                     <Button Content="stop game" Width="100" Click="Stop" IsEnabled="{Binding GameIsRunning}"/>
                 </StackPanel>
             </Grid>

@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Minimax.Views.MainWindow;
 
 namespace Minimax.Views
 {
@@ -27,10 +28,10 @@ namespace Minimax.Views
     {
         #region VARIABLES AND NESTED CLASSES
 
-        public enum Player
+        public enum GameType
         {
-            Max,
-            Min
+            AIvsPlayer,
+            AIvsAI
         }
 
         private string message = "";
@@ -116,6 +117,30 @@ namespace Minimax.Views
             }
         }
 
+        public GameType TypeOfGame { get; set; } = GameType.AIvsPlayer;
+
+        public string MaxName
+        {
+            get
+            {
+                if (TypeOfGame == GameType.AIvsPlayer)
+                    return "AI";
+                else
+                    return "AI 1";
+            }
+        }
+
+        public string MinName
+        {
+            get
+            {
+                if (TypeOfGame == GameType.AIvsPlayer)
+                    return "Player";
+                else
+                    return "AI 2";
+            }
+        }
+
         ObservableCollection<string> Moves { get; set; } = new ObservableCollection<string>();
 
         private CollectionViewSource movesSource = new CollectionViewSource();
@@ -150,13 +175,13 @@ namespace Minimax.Views
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void Start(object sender, RoutedEventArgs e)
+        private void AIvsPlayer(object sender, RoutedEventArgs e)
         {
             Message = "";
 
             try
             {
-                StartGame();
+                AIvsPlayer();
 
             }
             catch (Exception ex)
@@ -164,6 +189,21 @@ namespace Minimax.Views
                 message = ex.Message;
             }
 
+        }
+
+        private void AIvsAI(object sender, RoutedEventArgs e)
+        {
+            Message = "";
+
+            try
+            {
+                AIvsAI();
+
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
         }
 
         private void Stop(object sender, RoutedEventArgs e)
@@ -183,17 +223,17 @@ namespace Minimax.Views
 
         private void Get1Cube(object sender, RoutedEventArgs e)
         {
-            MinPlay(1);
+            PlayerPlay(1);
         }
 
         private void Get2Cubes(object sender, RoutedEventArgs e)
         {
-            MinPlay(2);
+            PlayerPlay(2);
         }
 
         private void GetKCubes(object sender, RoutedEventArgs e)
         {
-            MinPlay(K);
+            PlayerPlay(K);
         }
 
         #endregion
@@ -202,13 +242,28 @@ namespace Minimax.Views
         #region METHODS
 
         /// <summary>
-        /// Create a new game
+        /// Create a new game AI vs Player
         /// </summary>
-        private void StartGame()
+        private void AIvsPlayer()
         {
             GameIsRunning = true;
             CubesOnTable = M;
+            TypeOfGame = GameType.AIvsPlayer;
             Moves.Clear();
+            Moves.Add($"On the table there are {CubesOnTable} cubes");
+            MaxPlay();
+        }
+
+        /// <summary>
+        /// Create a new game AI vs AI
+        /// </summary>
+        private void AIvsAI()
+        {
+            GameIsRunning = true;
+            CubesOnTable = M;
+            TypeOfGame = GameType.AIvsAI;
+            Moves.Clear();
+            Moves.Add($"On the table there are {CubesOnTable} cubes");
             MaxPlay();
         }
 
@@ -218,6 +273,7 @@ namespace Minimax.Views
         private void StopGame()
         {
             Message = "Set M and K and press 'start game' to play";
+            //Moves.Clear();
             GameIsRunning = false;
         }
 
@@ -226,16 +282,15 @@ namespace Minimax.Views
         /// </summary>
         private void MaxPlay()
         {
-            Moves.Add($"On the table there are {CubesOnTable} cubes");
 
             if (cubesOnTable > 0)
             {
                 State state = new State();
                 state.CubesOnTable = CubesOnTable;
-                state.Player = Classes.Player.Max;
+                state.Player = Player.Max;
                 State nextBextState = State.Minimax(state);
 
-                Moves.Add($"AI is playing and gets {nextBextState.CubesRemoved} cubes from the table");
+                Moves.Add($"{MaxName} gets {nextBextState.CubesRemoved} cubes from the table");
                 CubesOnTable -= nextBextState.CubesRemoved;
                 Moves.Add($"On the table there are {CubesOnTable} cubes");
             }
@@ -243,13 +298,48 @@ namespace Minimax.Views
             // check if max wins
             if (cubesOnTable <= 0)
             {
-                Moves.Add($"AI won the game!");
+                Moves.Add($"{MaxName} won the game!");
                 StopGame();
             }
             else
             {
-                // ask player to make a choice
-                Moves.Add($"Press a button to select how many cuber to get from the table...");
+                if (TypeOfGame == GameType.AIvsPlayer)
+                {
+                    Moves.Add($"Press a button to select how many cuber to get from the table...");
+                }
+                else
+                {
+                    MinPlay();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Min decides and makes a move
+        /// </summary>
+        private void MinPlay()
+        {
+            if (cubesOnTable > 0)
+            {
+                State state = new State();
+                state.CubesOnTable = CubesOnTable;
+                state.Player = Player.Min;
+                State nextBextState = State.Minimax(state);
+
+                Moves.Add($"{MinName} gets {nextBextState.CubesRemoved} cubes from the table");
+                CubesOnTable -= nextBextState.CubesRemoved;
+                Moves.Add($"On the table there are {CubesOnTable} cubes");
+            }
+
+            // check if min wins
+            if (cubesOnTable <= 0)
+            {
+                Moves.Add($"{MinName} won the game!");
+                StopGame();
+            }
+            else
+            {
+                MaxPlay();
             }
         }
         
@@ -257,18 +347,17 @@ namespace Minimax.Views
         /// Min chooses and makes a move
         /// </summary>
         /// <param name="cubesToRemove"></param>
-        private void MinPlay(int cubesToRemove)
+        private void PlayerPlay(int cubesToRemove)
         {
-
             if (CubesOnTable >= cubesToRemove)
             {
                 CubesOnTable -= cubesToRemove;
-                Moves.Add($"Player gets {cubesToRemove} cubes from the table");
+                Moves.Add($"{MinName} gets {cubesToRemove} cubes from the table");
 
                 // check if min wins
                 if (cubesOnTable <= 0)
                 {
-                    Moves.Add($"Player won the game!");
+                    Moves.Add($"{MinName} won the game!");
                     StopGame();
                 }
                 else
@@ -282,10 +371,8 @@ namespace Minimax.Views
             }
         }
 
-
         #endregion
 
         
-
     }
 }

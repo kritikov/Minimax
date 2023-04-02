@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using System.Windows;
@@ -45,7 +46,7 @@ namespace Minimax.Views
             }
         }
 
-        private int m = 10;
+        private int m = 100;
         public int M
         {
             get
@@ -152,6 +153,20 @@ namespace Minimax.Views
             }
         }
 
+        private bool analysisIsRunning = false;
+        public bool AnalysisIsRunning
+        {
+            get
+            {
+                return analysisIsRunning;
+            }
+            set
+            {
+                analysisIsRunning = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisIsRunning)));
+            }
+        }
+
         public ObservableCollection<State> Analysis { get; set; } = new ObservableCollection<State>();
         private CollectionViewSource analysisSource = new CollectionViewSource();
         public ICollectionView AnalysisView
@@ -161,6 +176,9 @@ namespace Minimax.Views
                 return this.analysisSource.View;
             }
         }
+
+        private CancellationTokenSource analysisCancellToken = new CancellationTokenSource();
+        private CancellationTokenSource gameCancellToken = new CancellationTokenSource();
 
         #endregion
 
@@ -283,6 +301,8 @@ namespace Minimax.Views
                 state.CubesOnTable = M;
                 state.Player = Player.Max;
 
+                AnalysisIsRunning = true;
+
                 CreateTree(state);
 
             }
@@ -290,10 +310,22 @@ namespace Minimax.Views
             {
                 message = ex.Message;
             }
-
-            
         }
-        
+
+        private void StopCreatingTree(object sender, RoutedEventArgs e)
+        {
+            Message = "";
+
+            try
+            {
+                analysisCancellToken.Cancel();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
+        }
+
         #endregion
 
 
@@ -433,35 +465,49 @@ namespace Minimax.Views
             }
         }
 
-        private void CreateTree(State state)
+        private async Task CreateTree(State state)
         {
             try
             {
+                Analysis.Clear();
+
                 if (state.CubesOnTable > 0)
                 {
-                    // get the childrens of the initial state
-                    state.CreateChildrens();
+                    analysisCancellToken = new CancellationTokenSource();
 
-                    // evaluate childrens
-                    foreach (var child in state.Childrens)
-                        child.Evaluate();
+                    await Task.Run(() =>
+                    {
+                        // get the childrens of the initial state
+                        state.CreateChildrens();
+
+                        // evaluate childrens
+                        foreach (var child in state.Childrens)
+                            child.Evaluate(analysisCancellToken.Token);
+                    });
+                    
                 }
-
-                Analysis.Clear();
-                Analysis.Add(state);
-                analysisSource.Source = Analysis;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisView)));
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+            finally
+            {
+                Analysis.Add(state);
+                analysisSource.Source = Analysis;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisView)));
+
+                AnalysisIsRunning = false;
+
+                Message = "Creating tree stopped";
+            }
         }
+
+
+
 
         #endregion
 
-
-
-
+        
     }
 }

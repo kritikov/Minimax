@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Resources;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Minimax.Classes
@@ -32,7 +33,7 @@ namespace Minimax.Classes
         /// </summary>
         /// <param name="cubesToRemove"></param>
         /// <returns></returns>
-        public void CreateChild(int cubesToRemove)
+        public void CreateChildren(int cubesToRemove)
         {
             try
             {
@@ -59,31 +60,38 @@ namespace Minimax.Classes
         public void CreateChildrens()
         {
             foreach(var choice in State.Choices)
-                CreateChild(choice);
+                CreateChildren(choice);
         }
 
         /// <summary>
-        /// Evaluate a state. A state is final when there are no cubes on the table.
-        /// The score of a final state is twice the initial number of the cubes on the table.
-        /// From this score, we remove the number of moves to reach this state in the tree.
+        /// Evaluate the score of a state. A state is final when there are no cubes on the table.
+        /// The score of a final state is twice the initial number of the cubes on the table minus its depth in the tree
         /// This way, the best move from the availables is the winning one with the sorter path.
         /// If the state is not final then its score is the best from its childrens.
         /// </summary>
-        public void Evaluate()
+        public void Evaluate(CancellationToken? cancellationToken = null)
         {
+            // If the state is final state then evaluate it directly
             if (CubesOnTable == 0)
             {
                 Score = State.FinalStateScore - Depth;
-
                 Score = (Player == Player.Max) ? -1 * Score : 1 * Score;
             }
             else
             {
+                // We create recursive all the childrens only when we evaluate a state. 
+                // This way we create the whole tree only when we want evaluation at full depth.
+                // We could create the childrens until a specific depth if we used a different evaluation function
                 CreateChildrens();
 
-                foreach(var child in this.Childrens)
-                    child.Evaluate();
+                // stop the process if the user has cancel it
+                cancellationToken?.ThrowIfCancellationRequested();
 
+                // evaluate the score of the childrens
+                foreach (var child in this.Childrens)
+                    child.Evaluate(cancellationToken);
+
+                // evaluate the score of the current state by choosing its best children
                 if (Player == Player.Max)
                     Score = this.Childrens.Max(p => p.Score);
                 else
@@ -107,10 +115,10 @@ namespace Minimax.Classes
                 if (state.CubesOnTable <= 0)
                     return null;
 
-                // get the childrens of the initial state
+                // get the childrens of the state
                 state.CreateChildrens();
 
-                // evaluate childrens
+                // evaluate its childrens
                 foreach (var child in state.Childrens)
                     child.Evaluate();
 

@@ -46,7 +46,7 @@
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="10">
                     <Button Content="AI vs Player" Width="100" Click="AIvsPlayer" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"/>
                     <Button Content="AI vs AI" Width="100" Click="AIvsAI" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"/>
-                    <Button Content="stop game" Width="100" Click="Stop" IsEnabled="{Binding GameIsRunning}"/>
+                    <Button Content="Resign" Width="100" Click="Stop" IsEnabled="{Binding GameIsRunning}"/>
                 </StackPanel>
             </Grid>
 
@@ -70,7 +70,7 @@
                         </StackPanel>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Anaysis">
+                <TabItem Header="Analysis">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -111,8 +111,10 @@
                         </TreeView>
 
                         <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="create tree" Width="100" Click="CreateTree" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"
+                            <Button Content="create tree" Width="100" Click="CreateTree" IsEnabled="{Binding AnalysisIsRunning, Converter={StaticResource BooleanReverse}}"
                                     ToolTip="Create the tree with the states from the given parameters. At the root will be the initial state of the game"/>
+                            <Button Content="stop" Width="100" Click="StopCreatingTree" IsEnabled="{Binding AnalysisIsRunning}"
+                                    ToolTip="Stop creating the"/>
                         </StackPanel>
                     </Grid>
                 </TabItem>

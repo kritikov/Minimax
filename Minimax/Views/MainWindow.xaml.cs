@@ -341,15 +341,38 @@ namespace Minimax.Views
             }
         }
 
-        #endregion
+		#endregion
 
 
-        #region METHODS
+		#region METHODS
 
-        /// <summary>
-        /// Initialize the game using the given parameters
-        /// </summary>
-        private void InitializeGame()
+		/// <summary>
+		/// do an action in the application main thread
+		/// </summary>
+		/// <param name="action"></param>
+		public void Do(Action action)
+		{
+			if (Application.Current != null)
+			{
+				Application.Current.Dispatcher.Invoke(action);
+			}
+		}
+
+		/// <summary>
+		/// Add a message in the moves list
+		/// </summary>
+		/// <param name="message"></param>
+		public void AddMove(string message)
+		{
+			Do(() => {
+				Moves.Add(message);
+			});
+		}
+
+		/// <summary>
+		/// Initialize the game using the given parameters
+		/// </summary>
+		private void InitializeGame()
         {
             GameIsRunning = true;
             CubesOnTable = M;
@@ -398,41 +421,37 @@ namespace Minimax.Views
 
 			try
             {
+				MainWindow window = this;
+
                 await Task.Run(() =>
                 {
                     if (cubesOnTable > 0)
                     {
-						Do(() => {
-							Moves.Add($"{MaxName} is thinking...");
-						});
-						
-                        State state = new State();
+						window.AddMove($"{MaxName} is thinking...");
+
+						State state = new State();
                         state.CubesOnTable = CubesOnTable;
                         state.Player = Player.Max;
                         State nextBextState = State.Minimax(state);
 
-						Do(() => {
-							Moves.Add($"{MaxName} gets {nextBextState.CubesRemoved} cubes from the table");
-							CubesOnTable -= nextBextState.CubesRemoved;
-							Moves.Add($"On the table there are {CubesOnTable} cubes");
-						});
-                    }
+                        window.AddMove($"{MaxName} gets {nextBextState.CubesRemoved} cubes from the table");
+						CubesOnTable -= nextBextState.CubesRemoved;
+						window.AddMove($"On the table there are {CubesOnTable} cubes");
+					}
 
                     // check if max wins
                     if (cubesOnTable <= 0)
                     {
-						Do(() => {
-							Moves.Add($"{MaxName} won the game!");
-						});
-						
-                        StopGame();
+						window.AddMove($"{MaxName} won the game!");
+						StopGame();
                     }
                     else
                     {
                         if (TypeOfGame == GameType.AIvsPlayer)
                         {
+							window.AddMove($"Press a button to select how many cuber to get from the table...");
+
 							Do(() => {
-								Moves.Add($"Press a button to select how many cuber to get from the table...");
 								AIIsThinking = false;
 							});
                         }
@@ -464,36 +483,29 @@ namespace Minimax.Views
 
             try
             {
-                await Task.Run(() =>
+				MainWindow window = this;
+
+				await Task.Run(() =>
                 {
                     if (cubesOnTable > 0)
                     {
-						Do(() => {
-							Moves.Add($"{MinName} is thinking...");
-						});
+						window.AddMove($"{MinName} is thinking...");
 
 						State state = new State();
                         state.CubesOnTable = CubesOnTable;
                         state.Player = Player.Min;
                         State nextBextState = State.Minimax(state);
 
-                        Do(() =>
-                        {
-                            Moves.Add($"{MinName} gets {nextBextState.CubesRemoved} cubes from the table");
-                            CubesOnTable -= nextBextState.CubesRemoved;
-                            Moves.Add($"On the table there are {CubesOnTable} cubes");
-                        });
-                    }
+						window.AddMove($"{MinName} gets {nextBextState.CubesRemoved} cubes from the table");
+						CubesOnTable -= nextBextState.CubesRemoved;
+						window.AddMove($"On the table there are {CubesOnTable} cubes");
+					}
 
                     // check if min wins
                     if (cubesOnTable <= 0)
                     {
-                        Do(() =>
-                        {
-                            Moves.Add($"{MinName} won the game!");
-                        });
-
-                        StopGame();
+						window.AddMove($"{MinName} won the game!");
+						StopGame();
                     }
                     else
                     {
@@ -577,19 +589,6 @@ namespace Minimax.Views
                 Message = "Creating tree stopped";
             }
         }
-
-		/// <summary>
-		/// do an action in the application main thread
-		/// </summary>
-		/// <param name="action"></param>
-		public void Do(Action action)
-		{
-			if (Application.Current != null)
-			{
-				Application.Current.Dispatcher.Invoke(action);
-			}
-		}
-
 
 		#endregion
 

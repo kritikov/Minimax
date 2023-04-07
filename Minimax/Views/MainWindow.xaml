@@ -64,7 +64,6 @@
                         </Button.IsEnabled>
                     </Button>
                     <Button Content="Stop game" Width="100" Click="Stop" IsEnabled="{Binding GameIsRunning}"/>
-                    <Button Content="ai is thinking" Width="100" IsEnabled="{Binding AIIsThinking}"/>
                 </StackPanel>
             </Grid>
 

@@ -71,31 +71,38 @@ namespace Minimax.Classes
         /// </summary>
         public void Evaluate(CancellationToken? cancellationToken = null)
         {
-            // If the state is final state then evaluate it directly
-            if (CubesOnTable == 0)
+            try
             {
-                Score = State.FinalStateScore - Depth;
-                Score = (Player == Player.Max) ? -1 * Score : 1 * Score;
-            }
-            else
+				// If the state is final state then evaluate it directly
+				if (CubesOnTable == 0)
+				{
+					Score = State.FinalStateScore - Depth;
+					Score = (Player == Player.Max) ? -1 * Score : 1 * Score;
+				}
+				else
+				{
+					// stop the process if the user has cancel it
+					cancellationToken?.ThrowIfCancellationRequested();
+
+					// We create recursive all the childrens only when we evaluate a state. 
+					// This way we create the whole tree only when we want evaluation at full depth.
+					// We could create the childrens until a specific depth if we used a different evaluation function
+					CreateChildrens();
+
+					// evaluate the score of the childrens
+					foreach (var child in this.Childrens)
+						child.Evaluate(cancellationToken);
+
+					// evaluate the score of the current state by choosing its best children
+					if (Player == Player.Max)
+						Score = this.Childrens.Max(p => p.Score);
+					else
+						Score = this.Childrens.Min(p => p.Score);
+                }
+			}
+			catch (Exception ex)
             {
-                // We create recursive all the childrens only when we evaluate a state. 
-                // This way we create the whole tree only when we want evaluation at full depth.
-                // We could create the childrens until a specific depth if we used a different evaluation function
-                CreateChildrens();
-
-                // stop the process if the user has cancel it
-                cancellationToken?.ThrowIfCancellationRequested();
-
-                // evaluate the score of the childrens
-                foreach (var child in this.Childrens)
-                    child.Evaluate(cancellationToken);
-
-                // evaluate the score of the current state by choosing its best children
-                if (Player == Player.Max)
-                    Score = this.Childrens.Max(p => p.Score);
-                else
-                    Score = this.Childrens.Min(p => p.Score);
+                throw ex;
             }
         }
 
@@ -105,7 +112,7 @@ namespace Minimax.Classes
         /// <param name="state"></param>
         /// <param name="k"></param>
         /// <returns></returns>
-        public static State? Minimax(State state)
+        public static State? Minimax(State state, CancellationToken? cancellationToken = null)
         {
             State? nextBestState = null;
 
@@ -120,7 +127,7 @@ namespace Minimax.Classes
 
                 // evaluate its childrens
                 foreach (var child in state.Childrens)
-                    child.Evaluate();
+                    child.Evaluate(cancellationToken);
 
                 // choose as next move the one with the better evaluation
                 if (state.Player == Player.Max)

@@ -7,18 +7,20 @@
         xmlns:Classes="clr-namespace:Minimax.Classes"
         xmlns:local="clr-namespace:Minimax"
         mc:Ignorable="d"
-        Title="MiniMax game" Height="450" Width="655" WindowStartupLocation="CenterScreen">
+        Title="MiniMax game" Height="538" Width="734" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Converters:BooleanReverse x:Key="BooleanReverse"/>
         <Converters:BooleanToVisibility x:Key="BooleanToVisibility"/>
+        <Converters:GameBeginAllowedToBoolean x:Key="GameBeginAllowedToBoolean"/>
+        <Converters:CreateTreeAllowedToBoolean x:Key="CreateTreeAllowedToBoolean"/>
     </Window.Resources>
-    
+
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
             <TextBlock Text="{Binding Message}"/>
         </StatusBar>
-        
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
@@ -44,9 +46,23 @@
                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding K, Mode=TwoWay}" Width="50" HorizontalAlignment="Left"/>
 
                 <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="10">
-                    <Button Content="AI vs Player" Width="100" Click="AIvsPlayer" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"/>
-                    <Button Content="AI vs AI" Width="100" Click="AIvsAI" IsEnabled="{Binding GameIsRunning, Converter={StaticResource BooleanReverse}}"/>
-                    <Button Content="Resign" Width="100" Click="Stop" IsEnabled="{Binding GameIsRunning}"/>
+                    <Button Content="AI vs Player" Width="100" Click="AIvsPlayer">
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource GameBeginAllowedToBoolean}" Mode="OneWay">
+                                <Binding Path="GameIsRunning"/>
+                                <Binding Path="AnalysisIsRunning"/>
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
+                    <Button Content="AI vs AI" Width="100" Click="AIvsAI">
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource GameBeginAllowedToBoolean}" Mode="OneWay">
+                                <Binding Path="GameIsRunning"/>
+                                <Binding Path="AnalysisIsRunning"/>
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
+                    <Button Content="Stop game" Width="100" Click="Stop" IsEnabled="{Binding GameIsRunning}"/>
                 </StackPanel>
             </Grid>
 
@@ -111,18 +127,22 @@
                         </TreeView>
 
                         <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="create tree" Width="100" Click="CreateTree" IsEnabled="{Binding AnalysisIsRunning, Converter={StaticResource BooleanReverse}}"
-                                    ToolTip="Create the tree with the states from the given parameters. At the root will be the initial state of the game"/>
+                            <Button Content="create tree" Width="100" Click="CreateTree"
+                                    ToolTip="Create the tree with the states from the given parameters. At the root will be the initial state of the game">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource CreateTreeAllowedToBoolean}" Mode="OneWay">
+                                        <Binding Path="GameIsRunning"/>
+                                        <Binding Path="AnalysisIsRunning"/>
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
                             <Button Content="stop" Width="100" Click="StopCreatingTree" IsEnabled="{Binding AnalysisIsRunning}"
                                     ToolTip="Stop creating the"/>
                         </StackPanel>
                     </Grid>
                 </TabItem>
             </TabControl>
-            
-            
-            
         </Grid>
     </DockPanel>
-    
+
 </Window>

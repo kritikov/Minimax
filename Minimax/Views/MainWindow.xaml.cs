@@ -104,6 +104,20 @@ namespace Minimax.Views
             }
         }
 
+        private bool aiIsThinking = false;
+        public bool AIIsThinking
+        {
+            get
+            {
+                return aiIsThinking;
+            }
+            set
+            {
+				aiIsThinking = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AIIsThinking)));
+            }
+        }
+
         private bool minIsPlaying = false;
         public bool MinIsPlaying
         {
@@ -225,6 +239,7 @@ namespace Minimax.Views
 
             try
             {
+                AIIsThinking = true;
                 AIvsAI();
 
             }
@@ -369,7 +384,8 @@ namespace Minimax.Views
         {
             Message = "Set M and K and a game type to play";
             GameIsRunning = false;
-        }
+			AIIsThinking = false;
+		}
 
         /// <summary>
         /// Max decides and makes a move
@@ -447,9 +463,10 @@ namespace Minimax.Views
             {
                 CubesOnTable -= cubesToRemove;
                 Moves.Add($"{MinName} gets {cubesToRemove} cubes from the table");
+				Moves.Add($"On the table there are {CubesOnTable} cubes");
 
-                // check if min wins
-                if (cubesOnTable <= 0)
+				// check if min wins
+				if (cubesOnTable <= 0)
                 {
                     Moves.Add($"{MinName} won the game!");
                     StopGame();

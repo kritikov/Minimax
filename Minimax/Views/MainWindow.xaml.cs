@@ -433,6 +433,7 @@ namespace Minimax.Views
                         {
 							Do(() => {
 								Moves.Add($"Press a button to select how many cuber to get from the table...");
+								AIIsThinking = false;
 							});
                         }
                         else

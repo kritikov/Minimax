@@ -49,7 +49,10 @@ namespace Minimax.Classes
 	{
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
-            if (!(bool)values[0] && !(bool)values[1])
+			bool gameIsRunning = (bool)values[0];
+			bool analysisIsRunning = (bool)values[1];
+
+			if (!gameIsRunning && !analysisIsRunning)
             {
                 return true;
             }
@@ -69,7 +72,10 @@ namespace Minimax.Classes
 	{
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
-            if (!(bool)values[0] && !(bool)values[1])
+			bool gameIsRunning = (bool)values[0];
+			bool analysisIsRunning = (bool)values[1];
+
+			if (!gameIsRunning && !analysisIsRunning)
             {
                 return true;
             }
@@ -77,6 +83,30 @@ namespace Minimax.Classes
             {
                 return false;
             }
+		}
+
+		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class GamerChoicesAllowedToVisibility : IMultiValueConverter
+	{
+		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+		{
+            bool gameIsRunning = (bool)values[0];
+            bool aiIsThinking = (bool)values[1];
+
+
+			if (gameIsRunning && !aiIsThinking)
+            {
+				return Visibility.Visible;
+			}
+            else
+            {
+				return Visibility.Collapsed;
+			}
 		}
 
 		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

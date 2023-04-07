@@ -14,6 +14,7 @@
         <Converters:BooleanToVisibility x:Key="BooleanToVisibility"/>
         <Converters:GameBeginAllowedToBoolean x:Key="GameBeginAllowedToBoolean"/>
         <Converters:CreateTreeAllowedToBoolean x:Key="CreateTreeAllowedToBoolean"/>
+        <Converters:GamerChoicesAllowedToVisibility x:Key="GamerChoicesAllowedToVisibility"/>
     </Window.Resources>
 
     <DockPanel>
@@ -63,6 +64,7 @@
                         </Button.IsEnabled>
                     </Button>
                     <Button Content="Stop game" Width="100" Click="Stop" IsEnabled="{Binding GameIsRunning}"/>
+                    <Button Content="ai is thinking" Width="100" IsEnabled="{Binding AIIsThinking}"/>
                 </StackPanel>
             </Grid>
 
@@ -78,8 +80,14 @@
 
                         <ListView Grid.Row="0" ItemsSource="{Binding MovesView}"/>
 
-                        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center" 
-                            Visibility="{Binding GameIsRunning, Converter={StaticResource BooleanToVisibility}}">
+                        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel.Visibility>
+                                <MultiBinding Converter="{StaticResource GamerChoicesAllowedToVisibility}" Mode="OneWay">
+                                    <Binding Path="GameIsRunning"/>
+                                    <Binding Path="AIIsThinking"/>
+                                </MultiBinding>
+                            </StackPanel.Visibility>
+
                             <Button Content="get 1 cube" Click="Get1Cube"/>
                             <Button Content="get 2 cubes" Click="Get2Cubes"/>
                             <Button Content="get K cubes" Click="GetKCubes"/>

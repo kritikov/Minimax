@@ -46,7 +46,7 @@ namespace Minimax.Views
             }
         }
 
-        private int m = 100;
+        private int m = 30;
         public int M
         {
             get
@@ -390,68 +390,125 @@ namespace Minimax.Views
         /// <summary>
         /// Max decides and makes a move
         /// </summary>
-        private void MaxPlay()
+        private async Task MaxPlay()
         {
+			Do(() => {
+				AIIsThinking = true;
+			});
 
-            if (cubesOnTable > 0)
+			try
             {
-                State state = new State();
-                state.CubesOnTable = CubesOnTable;
-                state.Player = Player.Max;
-                State nextBextState = State.Minimax(state);
-
-                Moves.Add($"{MaxName} gets {nextBextState.CubesRemoved} cubes from the table");
-                CubesOnTable -= nextBextState.CubesRemoved;
-                Moves.Add($"On the table there are {CubesOnTable} cubes");
-            }
-
-            // check if max wins
-            if (cubesOnTable <= 0)
-            {
-                Moves.Add($"{MaxName} won the game!");
-                StopGame();
-            }
-            else
-            {
-                if (TypeOfGame == GameType.AIvsPlayer)
+                await Task.Run(() =>
                 {
-                    Moves.Add($"Press a button to select how many cuber to get from the table...");
-                }
-                else
-                {
-                    MinPlay();
-                }
+                    if (cubesOnTable > 0)
+                    {
+						Do(() => {
+							Moves.Add($"{MaxName} is thinking...");
+						});
+						
+                        State state = new State();
+                        state.CubesOnTable = CubesOnTable;
+                        state.Player = Player.Max;
+                        State nextBextState = State.Minimax(state);
+
+						Do(() => {
+							Moves.Add($"{MaxName} gets {nextBextState.CubesRemoved} cubes from the table");
+							CubesOnTable -= nextBextState.CubesRemoved;
+							Moves.Add($"On the table there are {CubesOnTable} cubes");
+						});
+                    }
+
+                    // check if max wins
+                    if (cubesOnTable <= 0)
+                    {
+						Do(() => {
+							Moves.Add($"{MaxName} won the game!");
+						});
+						
+                        StopGame();
+                    }
+                    else
+                    {
+                        if (TypeOfGame == GameType.AIvsPlayer)
+                        {
+							Do(() => {
+								Moves.Add($"Press a button to select how many cuber to get from the table...");
+							});
+                        }
+                        else
+                        {
+							Do(() => {
+								AIIsThinking = false;
+							});
+                            
+							MinPlay();
+                        }
+                    }
+                });
             }
-        }
+            catch(Exception ex)
+            {
+
+            }
+		}
         
         /// <summary>
         /// Min decides and makes a move
         /// </summary>
-        private void MinPlay()
+        private async void MinPlay()
         {
-            if (cubesOnTable > 0)
-            {
-                State state = new State();
-                state.CubesOnTable = CubesOnTable;
-                state.Player = Player.Min;
-                State nextBextState = State.Minimax(state);
+			Do(() => {
+				AIIsThinking = true;
+			});
 
-                Moves.Add($"{MinName} gets {nextBextState.CubesRemoved} cubes from the table");
-                CubesOnTable -= nextBextState.CubesRemoved;
-                Moves.Add($"On the table there are {CubesOnTable} cubes");
-            }
+            try
+            {
+                await Task.Run(() =>
+                {
+                    if (cubesOnTable > 0)
+                    {
+						Do(() => {
+							Moves.Add($"{MinName} is thinking...");
+						});
 
-            // check if min wins
-            if (cubesOnTable <= 0)
-            {
-                Moves.Add($"{MinName} won the game!");
-                StopGame();
+						State state = new State();
+                        state.CubesOnTable = CubesOnTable;
+                        state.Player = Player.Min;
+                        State nextBextState = State.Minimax(state);
+
+                        Do(() =>
+                        {
+                            Moves.Add($"{MinName} gets {nextBextState.CubesRemoved} cubes from the table");
+                            CubesOnTable -= nextBextState.CubesRemoved;
+                            Moves.Add($"On the table there are {CubesOnTable} cubes");
+                        });
+                    }
+
+                    // check if min wins
+                    if (cubesOnTable <= 0)
+                    {
+                        Do(() =>
+                        {
+                            Moves.Add($"{MinName} won the game!");
+                        });
+
+                        StopGame();
+                    }
+                    else
+                    {
+						Do(() => {
+							AIIsThinking = false;
+						});
+						
+                        MaxPlay();
+                    }
+                });
             }
-            else
-            {
-                MaxPlay();
-            }
-        }
+			catch (Exception ex)
+			{
+
+			}
+		}
         
         /// <summary>
         /// Min chooses and makes a move
@@ -520,11 +577,21 @@ namespace Minimax.Views
             }
         }
 
+		/// <summary>
+		/// do an action in the application main thread
+		/// </summary>
+		/// <param name="action"></param>
+		public void Do(Action action)
+		{
+			if (Application.Current != null)
+			{
+				Application.Current.Dispatcher.Invoke(action);
+			}
+		}
 
 
+		#endregion
 
-        #endregion
 
-        
-    }
+	}
 }

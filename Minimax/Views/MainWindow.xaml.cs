@@ -46,7 +46,7 @@ namespace Minimax.Views
             }
         }
 
-        private int m = 30;
+        private int m = 12;
         public int M
         {
             get
@@ -73,6 +73,34 @@ namespace Minimax.Views
                 k = value;
                 State.Choices[2] = k;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(K)));
+            }
+        }
+
+        private int evaluationType = 1;
+        public int EvaluationType
+        {
+            get
+            {
+                return evaluationType;
+            }
+            set
+            {
+                evaluationType = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EvaluationType)));
+            }
+        }
+
+        private int evaluationDepth = 4;
+        public int EvaluationDepth
+        {
+            get
+            {
+                return evaluationDepth;
+            }
+            set
+            {
+                evaluationDepth = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EvaluationDepth)));
             }
         }
 
@@ -552,6 +580,11 @@ namespace Minimax.Views
             }
         }
 
+        /// <summary>
+        /// Create the search tree to view its nodes
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         private async Task CreateTree(State state)
         {
             try
@@ -567,9 +600,18 @@ namespace Minimax.Views
                         // get the childrens of the initial state
                         state.CreateChildrens();
 
-                        // evaluate childrens
-                        foreach (var child in state.Childrens)
-                            child.Evaluate(analysisCancellToken.Token);
+                        if (EvaluationType == 1)
+                        {
+                            // evaluate childrens
+                            foreach (var child in state.Childrens)
+                                child.Evaluate(analysisCancellToken.Token);
+                        }
+                        else
+                        {
+                            // evaluate childrens
+                            foreach (var child in state.Childrens)
+                                child.Evaluate(EvaluationDepth, analysisCancellToken.Token);
+                        }
                     });
                     
                 }

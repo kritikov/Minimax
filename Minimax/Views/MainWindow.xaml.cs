@@ -56,7 +56,7 @@ namespace Minimax.Views
             set
             {
                 m = value;
-                State.FinalStateScore = M * 2;
+                State.FinalStateScore = m * 2;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(M)));
             }
         }
@@ -206,7 +206,7 @@ namespace Minimax.Views
             this.DataContext = this;
 
             movesSource.Source = Moves;
-
+            State.FinalStateScore = M * 2;
             Message = "Set M and K and a game type to play";
         }
 

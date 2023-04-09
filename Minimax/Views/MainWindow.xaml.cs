@@ -56,7 +56,7 @@ namespace Minimax.Views
             set
             {
                 m = value;
-                State.FinalStateScore = m * 2;
+                State.ScoreFactor = m * 2;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(M)));
             }
         }
@@ -76,30 +76,28 @@ namespace Minimax.Views
             }
         }
 
-        private int evaluationType = 1;
-        public int EvaluationType
+        public EvaluationType EvaluationType
         {
             get
             {
-                return evaluationType;
+                return State.EvaluationType;
             }
             set
             {
-                evaluationType = value;
+                State.EvaluationType = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EvaluationType)));
             }
         }
 
-        private int evaluationDepth = 4;
         public int EvaluationDepth
         {
             get
             {
-                return evaluationDepth;
+                return State.EvaluationDepth;
             }
             set
             {
-                evaluationDepth = value;
+                State.EvaluationDepth = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EvaluationDepth)));
             }
         }
@@ -160,6 +158,7 @@ namespace Minimax.Views
             }
         }
 
+        public bool AIFirstEvaluationSpoken = false;
         public GameType TypeOfGame { get; set; } = GameType.AIvsPlayer;
 
         public string MaxName
@@ -178,7 +177,7 @@ namespace Minimax.Views
             get
             {
                 if (TypeOfGame == GameType.AIvsPlayer)
-                    return "Player";
+                    return "You";
                 else
                     return "AI 2";
             }
@@ -234,7 +233,9 @@ namespace Minimax.Views
             this.DataContext = this;
 
             movesSource.Source = Moves;
-            State.FinalStateScore = M * 2;
+            M = 12;
+            EvaluationType = EvaluationType.Limited;
+            EvaluationDepth = 5;
             Message = "Set M and K and a game type to play";
         }
 
@@ -390,7 +391,7 @@ namespace Minimax.Views
 		/// Add a message in the moves list
 		/// </summary>
 		/// <param name="message"></param>
-		public void AddMove(string message)
+		public void AddLog(string message)
 		{
 			Do(() => {
 				Moves.Add(message);
@@ -404,6 +405,7 @@ namespace Minimax.Views
         {
             GameIsRunning = true;
             CubesOnTable = M;
+            AIFirstEvaluationSpoken = false;
             Moves.Clear();
             Moves.Add($"On the table there are {CubesOnTable} cubes");
         }
@@ -455,29 +457,39 @@ namespace Minimax.Views
                 {
                     if (cubesOnTable > 0)
                     {
-						window.AddMove($"{MaxName} is thinking...");
+						window.AddLog($"{MaxName} is thinking...");
 
 						State state = new State();
                         state.CubesOnTable = CubesOnTable;
                         state.Player = Player.Max;
                         State nextBextState = State.Minimax(state);
 
-                        window.AddMove($"{MaxName} gets {nextBextState.CubesRemoved} cubes from the table");
+                        if (nextBextState?.Score < 0 && EvaluationType == EvaluationType.Full && AIFirstEvaluationSpoken == false)
+                        {
+                            if(this.TypeOfGame == GameType.AIvsPlayer)
+                                window.AddLog($"{MaxName} says: 'If you play good, there is no way i could win this.'");
+                            else
+                                window.AddLog($"{MaxName} says: 'Ok, i will loose, but i will delay hoping for a unexpected shutdown...'");
+                            
+                            AIFirstEvaluationSpoken = true;
+                        }
+
+                        window.AddLog($"{MaxName} gets {nextBextState.CubesRemoved} cubes from the table");
 						CubesOnTable -= nextBextState.CubesRemoved;
-						window.AddMove($"On the table there are {CubesOnTable} cubes");
+						window.AddLog($"On the table there are {CubesOnTable} cubes");
 					}
 
                     // check if max wins
                     if (cubesOnTable <= 0)
                     {
-						window.AddMove($"{MaxName} won the game!");
+						window.AddLog($"{MaxName} won the game!");
 						StopGame();
                     }
                     else
                     {
                         if (TypeOfGame == GameType.AIvsPlayer)
                         {
-							window.AddMove($"Press a button to select how many cuber to get from the table...");
+							window.AddLog($"Press a button to select how many cubes to get from the table...");
 
 							Do(() => {
 								AIIsThinking = false;
@@ -517,22 +529,22 @@ namespace Minimax.Views
                 {
                     if (cubesOnTable > 0)
                     {
-						window.AddMove($"{MinName} is thinking...");
+						window.AddLog($"{MinName} is thinking...");
 
 						State state = new State();
                         state.CubesOnTable = CubesOnTable;
                         state.Player = Player.Min;
                         State nextBextState = State.Minimax(state);
 
-						window.AddMove($"{MinName} gets {nextBextState.CubesRemoved} cubes from the table");
+						window.AddLog($"{MinName} gets {nextBextState.CubesRemoved} cubes from the table");
 						CubesOnTable -= nextBextState.CubesRemoved;
-						window.AddMove($"On the table there are {CubesOnTable} cubes");
+						window.AddLog($"On the table there are {CubesOnTable} cubes");
 					}
 
                     // check if min wins
                     if (cubesOnTable <= 0)
                     {
-						window.AddMove($"{MinName} won the game!");
+						window.AddLog($"{MinName} won the game!");
 						StopGame();
                     }
                     else
@@ -600,18 +612,9 @@ namespace Minimax.Views
                         // get the childrens of the initial state
                         state.CreateChildrens();
 
-                        if (EvaluationType == 1)
-                        {
-                            // evaluate childrens
-                            foreach (var child in state.Childrens)
-                                child.Evaluate(analysisCancellToken.Token);
-                        }
-                        else
-                        {
-                            // evaluate childrens
-                            foreach (var child in state.Childrens)
-                                child.Evaluate(EvaluationDepth, analysisCancellToken.Token);
-                        }
+                        // evaluate childrens
+                        foreach (var child in state.Childrens)
+                            child.Evaluate(analysisCancellToken.Token);
                     });
                     
                 }

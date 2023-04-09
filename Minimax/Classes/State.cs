@@ -14,10 +14,18 @@ namespace Minimax.Classes
         Max
     }
 
+    public enum EvaluationType
+    {
+        Full = 1,
+        Limited = 2
+    }
+
     public class State
     {
         public static List<int> Choices = new List<int>() { 1, 2, 4 };
-        public static int FinalStateScore = 20;
+        public static int ScoreFactor = 20;
+        public static EvaluationType EvaluationType = EvaluationType.Full;
+        public static int EvaluationDepth = 5;
 
         public int CubesOnTable { get; set; } = 0;
         public Player Player { get; set; }
@@ -76,79 +84,33 @@ namespace Minimax.Classes
 				// If the state is final state then evaluate it directly
 				if (CubesOnTable == 0)
 				{
-					Score = State.FinalStateScore - Depth;
+                    Score = 2;
+                    Score = State.ScoreFactor - Depth + Score;
 					Score = (Player == Player.Max) ? -1 * Score : 1 * Score;
 				}
-				else
+                else if (State.EvaluationType == EvaluationType.Limited && this.Depth == State.EvaluationDepth)
+                {
+                    if (State.Choices.Contains(CubesOnTable))
+                        Score = 2;
+                    else if (CubesOnTable - 1 == 3 || CubesOnTable - 2 == 3 || CubesOnTable - State.Choices[2] == 3)
+                        Score = 1;
+                    else
+                        Score = 0;
+
+                    Score = State.ScoreFactor - Depth + Score;
+                    Score = (Player == Player.Max) ? 1 * Score : -1 * Score;
+                }
+                else
 				{
 					// stop the process if the user has cancel it
 					cancellationToken?.ThrowIfCancellationRequested();
 
 					// We create recursive all the childrens only when we evaluate a state. 
-					// This way we create the whole tree only when we want evaluation at full depth.
-					// We could create the childrens until a specific depth if we used a different evaluation function
 					CreateChildrens();
 
 					// evaluate the score of the childrens
 					foreach (var child in this.Childrens)
 						child.Evaluate(cancellationToken);
-
-					// evaluate the score of the current state by choosing its best children
-					if (Player == Player.Max)
-						Score = this.Childrens.Max(p => p.Score);
-					else
-						Score = this.Childrens.Min(p => p.Score);
-                }
-			}
-			catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// Evaluate the score of a state searching the tree until a specified depth.
-        /// </summary>
-        public void Evaluate(int maxSearchDepth, CancellationToken? cancellationToken = null)
-        {
-            try
-            {
-                // if we reached the depth then evaluate the state
-                if (CubesOnTable == 0)
-                {
-                    Score = State.FinalStateScore - Depth + 2;
-                    Score = (Player == Player.Max) ? -1 * Score : 1 * Score;
-                }
-                else if (this.Depth == maxSearchDepth)
-                {                    
-                    if (State.Choices.Contains(CubesOnTable))
-                    {
-                        Score = 2;
-                    }
-                    else if (CubesOnTable-1==3 || CubesOnTable - 2 == 3 || CubesOnTable - State.Choices[2] == 3)
-                    {
-                        Score = 1;
-                    }
-                    else
-                    {
-                        Score = 0;
-                    }
-                    Score = State.FinalStateScore - Depth + Score;
-                    Score = (Player == Player.Max) ? 1 * Score : -1 * Score;
-                }
-				else
-				{
-					// stop the process if the user has cancel it
-					cancellationToken?.ThrowIfCancellationRequested();
-
-					// We create recursive all the childrens only when we evaluate a state. 
-					// This way we create the whole tree only when we want evaluation at full depth.
-					// We could create the childrens until a specific depth if we used a different evaluation function
-					CreateChildrens();
-
-					// evaluate the score of the childrens
-					foreach (var child in this.Childrens)
-						child.Evaluate(maxSearchDepth, cancellationToken);
 
 					// evaluate the score of the current state by choosing its best children
 					if (Player == Player.Max)

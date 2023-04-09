@@ -15,7 +15,7 @@
         <Converters:GameBeginAllowedToBoolean x:Key="GameBeginAllowedToBoolean"/>
         <Converters:CreateTreeAllowedToBoolean x:Key="CreateTreeAllowedToBoolean"/>
         <Converters:GamerChoicesAllowedToVisibility x:Key="GamerChoicesAllowedToVisibility"/>
-        <Converters:RadioBoolToIntConverter x:Key="RadioBoolToIntConverter" />
+        <Converters:EvalTypeToIntConverter x:Key="RadioBoolToIntConverter" />
     </Window.Resources>
 
     <DockPanel>

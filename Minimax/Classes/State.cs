@@ -91,14 +91,18 @@ namespace Minimax.Classes
                 else if (State.EvaluationType == EvaluationType.Limited && this.Depth == State.EvaluationDepth)
                 {
                     if (State.Choices.Contains(CubesOnTable))
-                        Score = 2;
-                    else if (CubesOnTable - 1 == 3 || CubesOnTable - 2 == 3 || CubesOnTable - State.Choices[2] == 3)
-                        Score = 1;
-                    else
+                    {
+						Score = State.ScoreFactor - Depth + 2;
+						Score = (Player == Player.Max) ? 1 * Score : -1 * Score;
+					}
+					else if (CubesOnTable - 1 == 3 || CubesOnTable - 2 == 3 || CubesOnTable - State.Choices[2] == 3)
+                    {
+						Score = State.ScoreFactor - Depth + 1;
+						Score = (Player == Player.Max) ? 1 * Score : -1 * Score;
+					}
+					else
                         Score = 0;
 
-                    Score = State.ScoreFactor - Depth + Score;
-                    Score = (Player == Player.Max) ? 1 * Score : -1 * Score;
                 }
                 else
 				{

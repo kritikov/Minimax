@@ -370,6 +370,18 @@ namespace Minimax.Views
             }
         }
 
+		private void DisplayAboutWindow(object sender, RoutedEventArgs e)
+		{
+			try
+			{
+				AboutWindow window = new AboutWindow();
+				window.ShowDialog();
+			}
+			catch (Exception ex)
+			{
+				throw ex;
+			}
+		}
 		#endregion
 
 
@@ -635,8 +647,9 @@ namespace Minimax.Views
             }
         }
 
+
 		#endregion
 
-
+		
 	}
 }

@@ -1,0 +1,40 @@
+﻿<Window x:Class="Minimax.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Minimax.Views"
+        mc:Ignorable="d"
+        Title="About minimax game" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+
+    <Grid Style="{StaticResource InformationsWindowGridStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Style="{StaticResource TextBlockLabel}" Text="Informations about the minimax game"/>
+        <ScrollViewer Grid.Row="1" HorizontalContentAlignment="Stretch">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="SQL Tailor is an open source parser that formats SQL queries. It is built in WPF and C# and convert queries in various versions of SQL or in scripts that produce SQL, such as the SqlOM library." />
+                <TextBlock Text="It uses the Microsoft ScriptDOM library to parse the original query and then provides the translators who compose the resulting tokens in the desired versions." />
+                <TextBlock Text="A developer who wants a new variant of SQL can build a new translator without having to start from scratch. He may also use only the SQLParser that does the parsing instead of the entire application." />
+                <TextBlock >
+                                <Run Text="Current version of SQL Tailor is v1.0.6. You can download new versions or the sources from Github at "/>
+                                <Hyperlink NavigateUri="https://github.com/kritikov/SQLTailor-released" RequestNavigate="Hyperlink_RequestNavigate">
+                                    github.com/kritikov/SQLTailor-released
+                                </Hyperlink>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Run Text="created from Nick Kritikou"/>
+                                <LineBreak/>
+                                <Run Text="visit me at"/>
+                                <Hyperlink NavigateUri="http://nkode.gr/EN" RequestNavigate="Hyperlink_RequestNavigate">
+                                    nkode.gr
+                                </Hyperlink>
+
+                </TextBlock>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

@@ -177,7 +177,7 @@ namespace Minimax.Views
             get
             {
                 if (TypeOfGame == GameType.AIvsPlayer)
-                    return "You";
+                    return "Player";
                 else
                     return "AI 2";
             }
@@ -219,7 +219,6 @@ namespace Minimax.Views
         }
 
         private CancellationTokenSource analysisCancellToken = new CancellationTokenSource();
-        private CancellationTokenSource gameCancellToken = new CancellationTokenSource();
 
         #endregion
 
@@ -481,7 +480,7 @@ namespace Minimax.Views
                             if(this.TypeOfGame == GameType.AIvsPlayer)
                                 window.AddLog($"{MaxName} says: 'If you play good, there is no way i could win this.'");
                             else
-                                window.AddLog($"{MaxName} says: 'Ok, i will loose, but i will delay hoping for a unexpected shutdown...'");
+                                window.AddLog($"{MaxName} says: 'Ok, i will loose, but i will delay as much as i can hoping for a unexpected shutdown...'");
                             
                             AIFirstEvaluationSpoken = true;
                         }
@@ -527,7 +526,7 @@ namespace Minimax.Views
         /// <summary>
         /// Min decides and makes a move
         /// </summary>
-        private async void MinPlay()
+        private async Task MinPlay()
         {
 			Do(() => {
 				AIIsThinking = true;

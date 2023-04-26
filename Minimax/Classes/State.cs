@@ -71,18 +71,30 @@ namespace Minimax.Classes
                 CreateChildren(choice);
         }
 
-        /// <summary>
-        /// Evaluate the score of a state searching the whole tree. A state is final when there are no cubes on the table.
-        /// The score of a final state is twice the initial number of the cubes on the table minus its depth in the tree
-        /// This way, the best move from the availables is the winning one with the sorter path.
-        /// If the state is not final then its score is the best from its childrens.
-        /// </summary>
-        public void Evaluate(CancellationToken? cancellationToken = null)
+		/// <summary>
+		/// Returns true if the state is final
+		/// </summary>
+		/// <returns></returns>
+		public bool IsFinal()
+		{
+			if (CubesOnTable == 0)
+				return true;
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Evaluate the score of a state searching the whole tree. A state is final when there are no cubes on the table.
+		/// The score of a final state is twice the initial number of the cubes on the table minus its depth in the tree
+		/// This way, the best move from the availables is the winning one with the sorter path.
+		/// If the state is not final then its score is the best from its childrens.
+		/// </summary>
+		public void Evaluate(CancellationToken? cancellationToken = null)
         {
             try
             {
 				// If the state is final state then evaluate it directly
-				if (CubesOnTable == 0)
+				if (IsFinal())
 				{
                     Score = 2;
                     Score = State.ScoreFactor - Depth + Score;
@@ -142,7 +154,7 @@ namespace Minimax.Classes
             try
             {
                 // if there are no cubes on the table then there is no next move
-                if (state.CubesOnTable <= 0)
+                if (state.IsFinal())
                     return null;
 
                 // get the childrens of the state

@@ -75,7 +75,7 @@
                     </Grid>
                 </GroupBox>
 
-                <StackPanel Grid.Row="1">
+                <StackPanel>
                     <Button Content="AI vs Player" Width="100" Click="AIvsPlayer">
                         <Button.IsEnabled>
                             <MultiBinding Converter="{StaticResource GameBeginAllowedToBoolean}" Mode="OneWay">

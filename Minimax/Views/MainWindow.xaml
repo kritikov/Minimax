@@ -34,8 +34,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="0">
-                <GroupBox Grid.Row="0" Header="Parameters">
+            <StackPanel Grid.Column="0">
+                <GroupBox Header="Parameters">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*"/>
